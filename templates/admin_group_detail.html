@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ group.name }} // Dashboard Panitia</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-ring"></div>
+    <div class="loading-text">LOADING GROUP DETAIL...</div>
+  </div>
+
+  <div class="bg-vignette"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-scanline"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="admin-shell">
+    {% include "_admin_sidebar.html" %}
+
+    <main class="admin-main">
+      <div class="admin-page-head rise-in">
+        <a href="{{ url_for('admin_groups') }}" class="topbar-link">← Kembali ke Kelompok</a>
+        <h1 style="margin-top:10px;">{{ group.name }}</h1>
+      </div>
+
+      <div class="glass hud-corners admin-card rise-in">
+        <h3>Edit Kelompok</h3>
+        <form method="POST" action="{{ url_for('admin_group_update', group_id=group.id) }}" class="admin-form-grid">
+          <div class="field">
+            <label for="name">Nama Kelompok</label>
+            <input type="text" id="name" name="name" value="{{ group.name }}">
+          </div>
+          <div class="field">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+              <option value="not_started" {{ 'selected' if group.status == 'not_started' }}>Not Started</option>
+              <option value="in_progress" {{ 'selected' if group.status == 'in_progress' }}>In Progress</option>
+              <option value="completed" {{ 'selected' if group.status == 'completed' }}>Completed</option>
+            </select>
+          </div>
+          <div style="grid-column:1/-1; display:flex; gap:10px;">
+            <button type="submit" class="btn btn-purple">SIMPAN PERUBAHAN</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="glass hud-corners admin-card rise-in">
+        <h3>Progress Mission</h3>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Mission</th><th>Status</th><th>Poin</th><th>Attempts</th><th>Mission Code</th></tr></thead>
+            <tbody>
+              {% for m in missions %}
+              {% set p = progress_map.get(m.mission_key) %}
+              <tr>
+                <td>{{ m.icon }} {{ m.name }}</td>
+                <td>
+                  {% set status = p.status if p else 'locked' %}
+                  <span class="status-pill {{ 'ok' if status == 'completed' else ('mid' if status == 'in_progress' else 'bad') }}">{{ status.replace('_',' ')|upper }}</span>
+                </td>
+                <td>{{ p.correct_points if p else 0 }} / {{ m.requirement_points }}</td>
+                <td>{{ p.attempts if p else 0 }}</td>
+                <td class="mono text-online">{{ codes_map[m.mission_key].code if codes_map.get(m.mission_key) else '—' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="glass hud-corners admin-card rise-in">
+        <h3>Final Mission</h3>
+        <p>Final Mission, jawaban, dan presentasi kelompok dikelola di Website 3 (Final Mission).</p>
+      </div>
+
+      <div class="glass hud-corners admin-card rise-in" style="border-color: rgba(255,77,109,.35);">
+        <h3 class="text-offline">Zona Berbahaya</h3>
+        <p style="margin-bottom:14px;">Reset menghapus SELURUH pengerjaan kelompok ini di Website 1 (Mission 1–4). Data kelompok lain, Website 2, dan Website 3 tidak terpengaruh.</p>
+        <a class="btn btn-ghost" style="border-color: rgba(255,77,109,.4); color: var(--offline);" href="{{ url_for('admin_reset_page', group=group.group_number) }}">⟲ BUKA HALAMAN RESET PENGERJAAN</a>
+      </div>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>document.addEventListener("DOMContentLoaded", () => initParticles());</script>
+</body>
+</html>

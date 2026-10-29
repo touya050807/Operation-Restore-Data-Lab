@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelompok // Dashboard Panitia</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-ring"></div>
+    <div class="loading-text">LOADING GROUP MONITOR...</div>
+  </div>
+
+  <div class="bg-vignette"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-scanline"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="admin-shell">
+    {% include "_admin_sidebar.html" %}
+
+    <main class="admin-main">
+      <div class="admin-page-head rise-in">
+        <span class="eyebrow">MONITORING</span>
+        <h1>Kelompok</h1>
+      </div>
+
+      <div class="glass hud-corners admin-card rise-in">
+        <h3>Kode Akses Kelompok (Kelompok 1–5)</h3>
+        <p class="text-muted" style="margin-bottom:12px;">Hanya ada lima kelompok. Peserta masuk dengan kode ini dan tidak dapat berpindah kelompok. Kode yang sama berlaku di Website 1, 2, dan 3 (diatur lewat environment <span class="mono">GROUP_CODES</span>).</p>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Kelompok</th><th>Kode Akses</th><th>Sumber</th></tr></thead>
+            <tbody>
+              {% for n, ac in access_codes.items() %}
+              <tr><td>Kelompok {{ n }}</td><td class="mono text-online">{{ ac.code }}</td>
+                  <td>{{ 'BAWAAN (uji lokal — ganti di produksi)' if ac.default else 'Environment' }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="glass hud-corners admin-card rise-in">
+        <h3>Monitoring Progress Seluruh Kelompok</h3>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Kelompok</th>
+                {% for m in missions %}<th>{{ m.icon }} {{ m.name }}</th>{% endfor %}
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in monitor_rows %}
+              <tr>
+                <td><a href="{{ url_for('admin_group_detail', group_id=row.group.id) }}" class="text-purple">{{ row.group.name }}</a></td>
+                {% for status in row.mission_status %}
+                <td>
+                  {% if status == 'completed' %}<span class="mini-dot yes">✓</span>
+                  {% elif status == 'in_progress' %}<span class="status-pill mid">…</span>
+                  {% else %}<span class="mini-dot no">—</span>{% endif %}
+                </td>
+                {% endfor %}
+                <td><a href="{{ url_for('admin_group_detail', group_id=row.group.id) }}" class="btn btn-ghost btn-sm">Detail</a></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="glass hud-corners admin-card rise-in">
+        <h3>Seluruh Mission Code (per Mission)</h3>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Mission</th><th>Kelompok</th><th>Mission Code</th><th>Dibuat</th></tr></thead>
+            <tbody>
+              {% for m in missions %}
+                {% for row in monitor_rows %}
+                  {% set code_row = row.group_codes.get(m.mission_key) %}
+                  {% if code_row %}
+                  <tr>
+                    <td>{{ m.icon }} {{ m.name }}</td>
+                    <td>{{ row.group.name }}</td>
+                    <td class="mono text-online">{{ code_row.code }}</td>
+                    <td class="mono">{{ code_row.generated_at }}</td>
+                  </tr>
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>document.addEventListener("DOMContentLoaded", () => initParticles());</script>
+</body>
+</html>

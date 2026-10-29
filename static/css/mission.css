@@ -1,0 +1,9 @@
+/* ============================================================================
+   mission.css — dipakai bersama oleh semua halaman server (repair page)
+   ============================================================================ */
+
+.repair-panel.correct{ border-color: rgba(34,229,132,.45); }
+
+@media (max-width:600px){
+  .mission-main{ padding:22px 18px 50px; }
+}

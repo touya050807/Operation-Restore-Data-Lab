@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset Pengerjaan // Dashboard Panitia</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+  <div class="bg-vignette"></div><div class="bg-grid"></div><div class="bg-scanline"></div><div class="particles" id="particles"></div>
+  <div class="admin-shell">
+    {% set active = 'reset' %}{% include "_admin_sidebar.html" %}
+    <main class="admin-main">
+      <div class="admin-page-head rise-in"><span class="eyebrow">WEBSITE 1 — MAIN WEBSITE</span><h1>Reset Pengerjaan Kelompok</h1></div>
+
+      <div class="glass hud-corners admin-card rise-in" style="border-color: rgba(255,77,109,.35);">
+        <h3 class="text-offline">Reset seluruh pengerjaan satu kelompok</h3>
+        <p>Menghapus semua jawaban, progres, status penyelesaian, dan Mission Code kelompok yang dipilih pada <b>Website 1</b> (Mission 1–4).
+           Tidak menghapus identitas kelompok, bank soal, kunci jawaban, konfigurasi, kelompok lain, maupun data di Website 2 dan Website 3 —
+           reset di Website 2 dan 3 dilakukan terpisah di website masing-masing.</p>
+        <div class="field" style="max-width:420px;">
+          <label for="resetGroup">Pilih kelompok</label>
+          <select id="resetGroup">
+            {% for gr in groups %}<option value="{{ gr.group_number }}" {{ 'selected' if preselect == gr.group_number }}>Kelompok {{ gr.group_number }} — {{ gr.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <p id="resetOverview" class="text-muted" style="font-size:.85rem;"></p>
+        <button type="button" class="btn btn-ghost" id="resetOpen" style="border-color: rgba(255,77,109,.4); color: var(--offline);">Reset Pengerjaan</button>
+        <div id="resetNotice" role="status" aria-live="polite" style="margin-top:14px;"></div>
+      </div>
+
+      <div class="overlay" id="resetDialog" role="dialog" aria-modal="true" aria-labelledby="resetDialogTitle">
+        <div class="glass hud-corners" style="max-width:560px; margin:auto; padding:22px;">
+          <h3 id="resetDialogTitle" class="text-offline">Konfirmasi Reset</h3>
+          <p id="resetDialogText"></p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+            <button type="button" class="btn btn-ghost" id="resetCancel">Batal</button>
+            <button type="button" class="btn btn-purple" id="resetConfirm">Konfirmasi Reset</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script id="overviewData" type="application/json">{{ groups|map(attribute='overview')|list|tojson }}</script>
+  <script id="groupsData" type="application/json">{{ groups|map(attribute='group_number')|list|tojson }}</script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/admin_reset.js') }}"></script>
+</body>
+</html>

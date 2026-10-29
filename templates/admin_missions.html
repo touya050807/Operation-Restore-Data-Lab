@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mission // Dashboard Panitia</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-ring"></div>
+    <div class="loading-text">LOADING MISSION SETTINGS...</div>
+  </div>
+
+  <div class="bg-vignette"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-scanline"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="admin-shell">
+    {% include "_admin_sidebar.html" %}
+
+    <main class="admin-main">
+      <div class="admin-page-head rise-in">
+        <span class="eyebrow">CHALLENGE SETTINGS</span>
+        <h1>Mission</h1>
+        <p style="margin-top:8px;">Ubah nama, deskripsi, status aktif, requirement poin, retry/delay, dan Mission Code prefix untuk tiap mission — tanpa mengubah source code.</p>
+      </div>
+
+      {% for m in missions %}
+      <div class="glass hud-corners admin-card rise-in">
+        <h3>{{ m.icon }} {{ m.name }} <span class="tag-chip">{{ m.mission_key }}</span>
+          {% if m.station_mode %}<span class="tag-chip" style="border-color: rgba(255,176,32,.4); color:var(--warn);">🔒 STATION MODE</span>{% endif %}
+        </h3>
+        <form method="POST" action="{{ url_for('admin_mission_update', mission_id=m.id) }}" class="admin-form-grid">
+          <div class="field">
+            <label for="name_{{ m.id }}">Nama Mission</label>
+            <input type="text" id="name_{{ m.id }}" name="name" value="{{ m.name }}">
+          </div>
+          <div class="field">
+            <label for="icon_{{ m.id }}">Icon</label>
+            <input type="text" id="icon_{{ m.id }}" name="icon" value="{{ m.icon }}">
+          </div>
+          <div class="field" style="grid-column:1/-1;">
+            <label for="description_{{ m.id }}">Deskripsi</label>
+            <textarea id="description_{{ m.id }}" name="description" rows="2">{{ m.description }}</textarea>
+          </div>
+          <div class="field" style="grid-column:1/-1;">
+            <label for="instructions_{{ m.id }}">Instruksi</label>
+            <textarea id="instructions_{{ m.id }}" name="instructions" rows="2">{{ m.instructions }}</textarea>
+          </div>
+          <div class="field">
+            <label for="requirement_{{ m.id }}">Requirement Poin</label>
+            <input type="number" id="requirement_{{ m.id }}" name="requirement_points" value="{{ m.requirement_points }}" min="0">
+          </div>
+          <div class="field">
+            <label for="prefix_{{ m.id }}">Mission Code Prefix</label>
+            <input type="text" id="prefix_{{ m.id }}" name="mission_code_prefix" value="{{ m.mission_code_prefix }}" maxlength="6">
+          </div>
+          {% if m.station_mode %}
+          <div class="field">
+            <label for="station_password_{{ m.id }}">Password Station (kosongkan untuk tidak mengubah)</label>
+            <input type="text" id="station_password_{{ m.id }}" name="station_password" placeholder="Password saat ini: {{ m.station_password or '(belum diatur)' }}">
+          </div>
+          {% endif %}
+          <div class="field" style="grid-column:1/-1;">
+            <label class="check-option" style="display:inline-flex;">
+              <input type="checkbox" name="is_active" {{ 'checked' if m.is_active }}>
+              <span>Mission Aktif</span>
+            </label>
+          </div>
+          <div style="grid-column:1/-1;">
+            <button type="submit" class="btn btn-purple">SIMPAN {{ m.name.upper() }}</button>
+          </div>
+        </form>
+      </div>
+      {% endfor %}
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>document.addEventListener("DOMContentLoaded", () => initParticles());</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ mission.name }} // Restore Data Lab</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mission.css') }}">
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-ring"></div>
+    <div class="loading-text">CONNECTING TO {{ mission.name.upper() }}...</div>
+  </div>
+
+  <div class="bg-vignette"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-scanline"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="app-shell">
+    <header class="hud-bar">
+      <a href="{{ url_for('dashboard') }}" class="topbar-link">⌂ Dashboard Kelompok</a>
+      <div class="hud-id">KELOMPOK <b>{{ group.group_number }}</b> // {{ mission.name.upper() }}</div>
+    </header>
+
+    <div class="main-content">
+      <main class="mission-main">
+        <div class="mission-header rise-in">
+          <span class="eyebrow">{{ mission.icon }} {{ mission.name.upper() }} // STATUS: {{ 'ONLINE' if progress.status == 'completed' else 'OFFLINE' }}</span>
+          <h1>{{ mission.description }}</h1>
+          <p>{{ mission.instructions }}</p>
+
+          <div class="glass hud-corners fm-progress-panel rise-in" style="padding:18px 22px; margin-top:16px;">
+            <div class="progress-wrap">
+              <div class="progress-label">
+                <span>MISSION PROGRESS</span>
+                <span id="progressLabel">{{ progress.correct_points }} / {{ mission.requirement_points }} poin</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" id="progressFill" style="width: {{ ((progress.correct_points / mission.requirement_points * 100) if mission.requirement_points else 100)|round(0,'floor')|int }}%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% if mission.mission_key == 'database' %}
+        <div class="repair-panel glass hud-corners rise-in delay-1">
+          <div class="r-head"><span class="r-num">⇩</span><span class="r-title">Dataset Mahasiswa</span></div>
+          <p style="font-size:.88rem;">Unduh dataset untuk dianalisis lewat Excel / Google Colab.</p>
+          <a href="{{ url_for('download_dataset') }}" class="btn btn-ghost" style="margin-top:10px; display:inline-block;">⇩ DOWNLOAD student_dataset.csv</a>
+        </div>
+        {% endif %}
+
+        {% if mission_code %}
+        <div class="glass hud-corners locked-note rise-in">
+          <span class="text-online" style="font-size:1.3rem;">●</span>
+          <div>
+            <b>{{ mission.name }} — SELESAI</b>
+            <p style="margin:2px 0 0;">Mission Code: <span class="mono text-online">{{ mission_code }}</span></p>
+          </div>
+        </div>
+        {% endif %}
+
+        <div id="questionList"></div>
+
+        <div id="cooldownBox" class="submit-message" role="status" aria-live="polite" style="display:none;"></div>
+        <div id="submitMessage" class="submit-message" role="status" aria-live="polite" style="display:none;"></div>
+        <div class="submit-row" id="submitRow" style="display:none;">
+          <button type="button" class="btn btn-purple" id="submitBtn">⚙ PERIKSA SEMUA JAWABAN YANG TERISI</button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="overlay" id="scanOverlay">
+    <div class="modal-box glass hud-corners rise-in">
+      <div class="loader-ring" style="margin:0 auto;"></div>
+      <div class="scan-progress">Memeriksa Jawaban...</div>
+      <div class="scan-bar"><div class="scan-bar-fill"></div></div>
+      <div class="scan-percent">0%</div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/drag_order.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/question_render.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/answer_flow.js') }}"></script>
+  <script id="questionsData" type="application/json">{{ questions_json|tojson }}</script>
+  <script>
+    const MISSION_KEY = {{ mission.mission_key|tojson }};
+    const GROUP_NUMBER = {{ group.group_number|tojson }};
+    const RESET_EPOCH = {{ reset_epoch|tojson }};
+    const COOLDOWN_INIT = {{ cooldown_remaining|tojson }};   // sisa detik jeda dari SERVER saat halaman dimuat
+  </script>
+  <script src="{{ url_for('static', filename='js/mission_participant.js') }}"></script>
+</body>
+</html>

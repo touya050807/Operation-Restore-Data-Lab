@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bank Soal // Dashboard Panitia</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/staff.css') }}">
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-ring"></div>
+    <div class="loading-text">LOADING BANK SOAL...</div>
+  </div>
+
+  <div class="bg-vignette"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-scanline"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="admin-shell">
+    {% include "_admin_sidebar.html" %}
+
+    <main class="admin-main">
+      <div class="admin-page-head rise-in">
+        {% if error %}<div class="alert-bar err">{{ error }}</div>{% endif %}
+        <span class="eyebrow">BANK SOAL</span>
+        <h1>Pertanyaan</h1>
+        <p style="margin-top:8px;">Bank soal Mission 1, 2, 3 dan 4 (Algorithm Engine). Soal Knowledge Core (Mission 5) dikelola di Website 2. Tambah, edit, hapus, aktif/nonaktifkan soal di sini.</p>
+      </div>
+
+      <!-- ============ FORM TAMBAH / EDIT ============ -->
+      <div class="glass hud-corners admin-card rise-in" id="questionFormCard">
+        <h3 id="formTitle">+ Tambah Soal Baru</h3>
+        <form method="POST" action="{{ url_for('admin_question_save') }}" class="admin-form-grid" id="questionForm">
+          <input type="hidden" name="id" id="f_id">
+
+          <div class="field">
+            <label for="f_mission">Mission</label>
+            <select name="mission_id" id="f_mission">
+              {% for m in missions %}<option value="{{ m.id }}">{{ m.icon }} {{ m.name }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="f_category">Kategori</label>
+            <select name="category" id="f_category">
+              {% for c in categories %}<option value="{{ c.name }}">{{ c.name }}{{ '' if c.is_active else ' (inactive)' }}</option>{% endfor %}
+            </select>
+            <small class="text-muted"><a href="{{ url_for('admin_categories') }}" class="topbar-link">Kelola kategori</a></small>
+          </div>
+
+          <div class="field" style="grid-column:1/-1;">
+            <label for="f_prompt">Pertanyaan</label>
+            <textarea name="prompt" id="f_prompt" rows="3" required></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f_type">Tipe Jawaban</label>
+            <select name="answer_type" id="f_type">
+              <option value="text">Text (Essay singkat/isian)</option>
+              <option value="number">Number (Isian Angka)</option>
+              <option value="essay">Essay (jawaban panjang, dinilai selesai otomatis)</option>
+              <option value="true_false">Benar / Salah</option>
+              <option value="multiple_choice">Pilihan Ganda (1 jawaban)</option>
+              <option value="multiple_select">Pilihan Ganda (lebih dari 1 jawaban)</option>
+              <option value="ordering">Ordering / Drag & Drop (susun urutan)</option>
+              <option value="matching">Matching (mencocokkan pasangan)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f_points">Poin</label>
+            <input type="number" name="points" id="f_points" value="1" min="1">
+          </div>
+
+          <div class="field" id="matchModeField">
+            <label for="f_match">Match Mode (khusus Text)</label>
+            <select name="match_mode" id="f_match">
+              <option value="case_insensitive">Case Insensitive</option>
+              <option value="space">Spasi dirapikan, huruf besar/kecil dibedakan</option>
+              <option value="exact">Exact Match</option>
+              <option value="trim">Trim Whitespace</option>
+            </select>
+          </div>
+
+          <!-- MULTIPLE CHOICE / MULTIPLE SELECT -->
+          <div class="field" id="optionsField" style="grid-column:1/-1; display:none;">
+            <label for="f_options">Pilihan Jawaban (satu per baris)</label>
+            <textarea name="options" id="f_options" rows="4" placeholder="Opsi 1&#10;Opsi 2&#10;Opsi 3"></textarea>
+          </div>
+          <div class="field" id="multiCorrectField" style="grid-column:1/-1; display:none;">
+            <label for="f_multi_correct">Jawaban Benar (satu per baris, harus sama persis dengan salah satu opsi di atas — boleh lebih dari satu)</label>
+            <textarea name="multi_correct" id="f_multi_correct" rows="3" placeholder="Opsi yang benar..."></textarea>
+          </div>
+
+          <!-- ORDERING -->
+          <div class="field" id="orderingItemsField" style="grid-column:1/-1; display:none;">
+            <label for="f_ordering_items">Item yang Ditampilkan ke Peserta (satu per baris, urutan tampil bebas/acak)</label>
+            <textarea name="ordering_items" id="f_ordering_items" rows="4" placeholder="Langkah A&#10;Langkah B&#10;Langkah C"></textarea>
+          </div>
+          <div class="field" id="orderingCorrectField" style="grid-column:1/-1; display:none;">
+            <label for="f_ordering_correct">Urutan yang Benar (satu per baris, dari atas ke bawah, teks harus sama persis dengan item di atas)</label>
+            <textarea name="ordering_correct" id="f_ordering_correct" rows="4" placeholder="Langkah B&#10;Langkah A&#10;Langkah C"></textarea>
+          </div>
+
+          <!-- MATCHING -->
+          <div class="field" id="matchingField" style="grid-column:1/-1; display:none;">
+            <label for="f_matching_pairs">Pasangan Benar (format: <code>Kiri =&gt; Kanan</code>, satu pasang per baris)</label>
+            <textarea name="matching_pairs" id="f_matching_pairs" rows="4" placeholder="Variable => Tempat menyimpan nilai&#10;Loop => Perulangan proses"></textarea>
+          </div>
+
+          <div class="field" id="answerFieldText">
+            <label for="f_answer">Jawaban Benar</label>
+            <input type="text" name="correct_answer" id="f_answer" placeholder="Jawaban benar persis">
+          </div>
+          <div class="field" id="answerFieldTF" style="display:none;">
+            <label for="f_answer_tf">Jawaban Benar</label>
+            <select id="f_answer_tf">
+              <option value="true">Benar (True)</option>
+              <option value="false">Salah (False)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="check-option" style="display:inline-flex;">
+              <input type="checkbox" name="is_active" id="f_active" checked>
+              <span>Soal Aktif</span>
+            </label>
+          </div>
+
+          <div style="grid-column:1/-1; display:flex; gap:10px;">
+            <button type="submit" class="btn btn-purple">💾 SIMPAN SOAL</button>
+            <button type="button" class="btn btn-ghost" id="cancelEditBtn" style="display:none;">Batal Edit</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ============ FILTER ============ -->
+      <form method="GET" action="{{ url_for('admin_questions') }}" class="admin-toolbar">
+        <select name="mission">
+          <option value="">Semua Mission</option>
+          {% for m in missions %}<option value="{{ m.mission_key }}" {{ 'selected' if mission_filter == m.mission_key }}>{{ m.name }}</option>{% endfor %}
+        </select>
+        <select name="category">
+          <option value="">Semua Kategori</option>
+          {% for c in categories %}<option value="{{ c.name }}" {{ 'selected' if category_filter == c.name }}>{{ c.name }}</option>{% endfor %}
+        </select>
+        <select name="active">
+          <option value="">Semua Status</option>
+          <option value="active" {{ 'selected' if active_filter == 'active' }}>Aktif</option>
+          <option value="inactive" {{ 'selected' if active_filter == 'inactive' }}>Nonaktif</option>
+        </select>
+        <input type="text" name="q" value="{{ search }}" placeholder="Cari soal...">
+        <button type="submit" class="btn btn-ghost btn-sm">Filter</button>
+      </form>
+
+      <!-- ============ TABEL SOAL ============ -->
+      <div class="glass hud-corners admin-card rise-in">
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Mission</th><th>Kategori</th><th>Pertanyaan</th><th>Tipe</th><th>Poin</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              {% for q in questions %}
+              <tr>
+                <td>{{ q.mission_name }}</td>
+                <td><span class="tag-chip">{{ q.category }}</span></td>
+                <td style="white-space:normal; min-width:240px; overflow-wrap:anywhere;">{{ q.prompt }}</td>
+                <td>{{ q.answer_type }}</td>
+                <td>{{ q.points }}</td>
+                <td><span class="status-pill {{ 'ok' if q.is_active else 'bad' }}">{{ 'AKTIF' if q.is_active else 'NONAKTIF' }}</span></td>
+                <td style="display:flex; gap:6px;">
+                  <button type="button" class="btn btn-ghost btn-sm edit-question-btn"
+                          data-question='{{ q|tojson }}'>Edit</button>
+                  <form method="POST" action="{{ url_for('admin_question_toggle', question_id=q.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-ghost btn-sm">{{ 'Nonaktifkan' if q.is_active else 'Aktifkan' }}</button>
+                  </form>
+                  <form method="POST" action="{{ url_for('admin_question_delete', question_id=q.id) }}" style="display:inline;" onsubmit="return confirm('Hapus soal ini?');">
+                    <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--offline);">Hapus</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/admin_questions.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Panitia // Restore Data Lab</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-ring"></div>
+    <div class="loading-text">LOADING PANITIA DASHBOARD...</div>
+  </div>
+
+  <div class="bg-vignette"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-scanline"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="admin-shell">
+    {% include "_admin_sidebar.html" %}
+
+    <main class="admin-main">
+      <div class="admin-page-head rise-in">
+        <span class="eyebrow">PANITIA CONTROL PANEL</span>
+        <h1>Dashboard Panitia</h1>
+      </div>
+
+      <div class="stat-grid">
+        <div class="glass hud-corners stat-card rise-in delay-1">
+          <div class="stat-value">{{ total_groups }}</div>
+          <div class="stat-label">Total Kelompok</div>
+        </div>
+        <div class="glass hud-corners stat-card rise-in delay-2">
+          <div class="stat-value">{{ active_groups }}</div>
+          <div class="stat-label">Kelompok Aktif</div>
+        </div>
+        <div class="glass hud-corners stat-card rise-in delay-3">
+          <div class="stat-value">{{ all_codes_count }}</div>
+          <div class="stat-label">Selesai Mission di Website 1</div>
+        </div>
+        <div class="glass hud-corners stat-card rise-in delay-4">
+          <div class="stat-value">{{ completed_groups }}</div>
+          <div class="stat-label">Challenge Selesai</div>
+        </div>
+      </div>
+
+      <div class="glass hud-corners admin-card rise-in">
+        <h3>Progress per Mission</h3>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Mission</th><th>Status</th><th>Kelompok Selesai</th></tr></thead>
+            <tbody>
+              {% for s in mission_stats %}
+              <tr>
+                <td>{{ s.mission.icon }} {{ s.mission.name }}</td>
+                <td><span class="status-pill {{ 'ok' if s.mission.is_active else 'bad' }}">{{ 'AKTIF' if s.mission.is_active else 'NONAKTIF' }}</span></td>
+                <td>{{ s.completed }} / {{ total_groups }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="mono text-muted" style="font-size:.8rem;">
+        Untuk monitoring detail tiap kelompok, buka menu <a href="{{ url_for('admin_groups') }}" class="text-purple">Kelompok</a>.
+      </p>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>document.addEventListener("DOMContentLoaded", () => initParticles());</script>
+</body>
+</html>

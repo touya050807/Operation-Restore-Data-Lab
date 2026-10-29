@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ mission.name }} — Station Panitia // Restore Data Lab</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mission.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/group.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/staff.css') }}">
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-ring"></div>
+    <div class="loading-text">CONNECTING TO {{ mission.name.upper() }} STATION...</div>
+  </div>
+
+  <div class="bg-vignette"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-scanline"></div>
+  <div class="particles" id="particles"></div>
+
+  {% if not unlocked %}
+  <!-- ============ PASSWORD GATE ============ -->
+  <main class="landing-wrap">
+    <div class="container" style="max-width:420px; margin:0 auto;">
+      <div class="glass hud-corners rise-in" style="padding:36px 32px;">
+        <div style="text-align:center; margin-bottom:22px;">
+          <div class="logo-hex" style="margin:0 auto 14px;">{{ mission.icon }}</div>
+          <span class="eyebrow">MEJA PANITIA</span>
+          <h1 style="font-size:1.3rem; margin-top:8px;">{{ mission.name }} — Station Access</h1>
+          <p style="margin-top:8px; font-size:.85rem;">Mission ini dikerjakan langsung di meja panitia. Masukkan password station untuk mulai menginput jawaban kelompok.</p>
+        </div>
+
+        <div class="alert alert-error" id="authError">❌ Password salah.</div>
+        <div class="field">
+          <label for="stationPassword">Password Station</label>
+          <input type="password" id="stationPassword" placeholder="••••••••" autocomplete="off">
+        </div>
+        <button type="button" class="btn btn-purple btn-block" id="authSubmit">MASUK STATION →</button>
+        <p style="text-align:center; margin-top:18px;">
+          <a href="{{ url_for('panitia_operations') }}" class="topbar-link">← Panitia Operations</a>
+        </p>
+      </div>
+    </div>
+  </main>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+    const STATION_KEY = {{ mission.mission_key|tojson }};
+    document.addEventListener("DOMContentLoaded", () => {
+      initParticles();
+      document.getElementById("authSubmit").addEventListener("click", async () => {
+        hideAlert("authError");
+        const password = document.getElementById("stationPassword").value;
+        const res = await fetch(`/api/station/${STATION_KEY}/auth`, {
+          method: "POST", headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({ password }),
+        });
+        const data = await res.json();
+        if (data.success) window.location.reload();
+        else showAlert("authError", "error");
+      });
+      document.getElementById("stationPassword").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") document.getElementById("authSubmit").click();
+      });
+    });
+  </script>
+
+  {% else %}
+  <!-- ============ STATION SHELL (input jawaban di meja panitia) ============ -->
+  <div class="app-shell">
+    <header class="hud-bar">
+      <a href="{{ url_for('panitia_operations') }}" class="topbar-link">← Panitia Operations</a>
+      <a href="{{ url_for('station_lock', key=mission.mission_key) }}" class="topbar-link">🔒 Kunci Ulang Station</a>
+      <div class="hud-id">{{ mission.icon }} {{ mission.name.upper() }} — STATION PANITIA</div>
+    </header>
+
+    <div class="main-content">
+      <main class="mission-main">
+        <div class="mission-header rise-in">
+          <span class="eyebrow">MEJA PANITIA // {{ mission.name.upper() }}</span>
+          <h1>{{ mission.description }}</h1>
+          <p>{{ mission.instructions }}</p>
+        </div>
+
+        <div class="glass hud-corners rise-in" style="padding:14px 20px; display:flex; gap:22px; flex-wrap:wrap; align-items:center; font-family:var(--font-mono); font-size:.78rem;">
+          <span><i class="status-dot"></i>&nbsp; STATUS: ONLINE</span>
+          <span>CURRENT GROUP: <b id="currentGroupLabel" class="text-blue">—</b></span>
+        </div>
+
+        <div class="repair-panel glass hud-corners rise-in delay-1">
+          <div class="r-head"><span class="r-num">👥</span><span class="r-title">Kelompok yang sedang dilayani</span></div>
+          <div class="field" style="margin-bottom:0;">
+            <select id="groupSwitcher">
+              {% for grp in groups %}
+              <option value="{{ grp.id }}">Kelompok {{ grp.group_number }} — {{ grp.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <p class="mono text-muted" style="font-size:.72rem; margin-top:10px;">Pilihan ini hanya tersedia bagi panitia yang sudah login (akses administratif); peserta tidak memiliki menu ini.</p>
+        </div>
+
+        <div class="glass hud-corners fm-progress-panel rise-in" style="padding:18px 22px;">
+          <div class="progress-wrap">
+            <div class="progress-label"><span>MISSION PROGRESS</span><span id="progressLabel">0 / 0 poin</span></div>
+            <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%;"></div></div>
+          </div>
+        </div>
+
+        <div id="missionCodeBox" class="glass hud-corners locked-note rise-in" style="display:none;">
+          <span class="text-online" style="font-size:1.3rem;">●</span>
+          <div><b id="missionCodeGroupLabel"></b><p style="margin:2px 0 0;">Mission Code: <span class="mono text-online" id="missionCodeValue"></span></p></div>
+        </div>
+
+        {% if mission.mission_key == 'database' %}
+        <div class="repair-panel glass hud-corners rise-in">
+          <div class="r-head"><span class="r-num">⇩</span><span class="r-title">Dataset Mahasiswa</span></div>
+          <a href="{{ url_for('download_dataset_public') }}" class="btn btn-ghost" style="margin-top:10px; display:inline-block;">⇩ DOWNLOAD student_dataset.csv</a>
+          <a href="{{ url_for('dataset_view') }}" target="_blank" rel="noopener" class="btn btn-ghost" style="margin-top:10px; display:inline-block;">👁 LIHAT TABEL DATASET</a>
+        </div>
+        {% endif %}
+
+        <div id="questionList"></div>
+
+        <div id="submitMessage" class="submit-message" role="status" aria-live="polite" style="display:none;"></div>
+        <div class="submit-row" id="submitRow" style="display:none;">
+          <button type="button" class="btn btn-purple" id="submitBtn">⚙ PERIKSA SEMUA JAWABAN KELOMPOK INI</button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="overlay" id="scanOverlay">
+    <div class="modal-box glass hud-corners rise-in">
+      <div class="loader-ring" style="margin:0 auto;"></div>
+      <div class="scan-progress">Memeriksa Jawaban...</div>
+      <div class="scan-bar"><div class="scan-bar-fill"></div></div>
+      <div class="scan-percent">0%</div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/drag_order.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/question_render.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/answer_flow.js') }}"></script>
+  <script>const STATION_KEY = {{ mission.mission_key|tojson }};</script>
+  <script src="{{ url_for('static', filename='js/station.js') }}"></script>
+  {% endif %}
+</body>
+</html>

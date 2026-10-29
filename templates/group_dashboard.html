@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Kelompok // Restore Data Lab</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mission.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/group.css') }}">
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-ring"></div>
+    <div class="loading-text">LOADING GROUP DASHBOARD...</div>
+  </div>
+
+  <div class="bg-vignette"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-scanline"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="app-shell">
+    <header class="hud-bar">
+      <div class="hud-id">KELOMPOK <b>{{ group.group_number }}</b> // {{ group.name.upper() }}</div>
+    </header>
+
+    <div class="main-content">
+      <main class="mission-main" style="max-width:980px;">
+
+        <div class="mission-header rise-in">
+          <span class="eyebrow">◆ MISSION CONTROL</span>
+          <h1>Data Lab Recovery Status</h1>
+          <p>Selesaikan kelima mission untuk mengumpulkan Mission Code, lalu bawa seluruhnya ke meja panitia Final Mission.</p>
+        </div>
+
+        <div class="server-grid" style="margin-bottom:30px;">
+          {% for m in missions %}
+          {% set p = progress_map.get(m.mission_key) %}
+          {% set status = p.status if p else 'locked' %}
+          {% if m.mission_key == 'knowledge' %}
+          <a href="{{ url_for('go_external', target='mission5') }}" class="server-card glass hud-corners rise-in delay-{{ loop.index }}">
+            <div class="s-head"><span class="s-icon">{{ m.icon }}</span></div>
+            <h3 class="s-name">{{ m.name }}</h3>
+            <p class="s-sub">{{ m.description }}</p>
+            <span class="mono text-purple" style="font-size:.7rem; margin-top:6px;">↗ Dikerjakan di Website Knowledge Core (Mission 5)</span>
+          </a>
+          {% elif m.station_mode %}
+          <div class="server-card glass hud-corners rise-in delay-{{ loop.index }} {{ 'online' if status == 'completed' }}" style="cursor:default;">
+            <div class="s-head"><span class="s-icon">{{ m.icon }}</span></div>
+            <h3 class="s-name">{{ m.name }}</h3>
+            <p class="s-sub">{{ m.description }}</p>
+            <span class="s-status">
+              <span class="dot"></span>
+              {% if status == 'completed' %}COMPLETED
+              {% elif status == 'in_progress' %}IN PROGRESS
+              {% else %}BELUM DIMULAI{% endif %}
+            </span>
+            <span class="mono text-purple" style="font-size:.7rem; margin-top:6px;">📍 Dikerjakan di meja panitia</span>
+            {% if codes_map.get(m.mission_key) %}
+            <span class="mono text-online" style="font-size:.8rem; margin-top:4px;">{{ codes_map[m.mission_key].code }}</span>
+            {% endif %}
+          </div>
+          {% else %}
+          <a href="{{ url_for('mission_page', key=m.mission_key) }}"
+             class="server-card glass hud-corners rise-in delay-{{ loop.index }} {{ 'online' if status == 'completed' }}">
+            <div class="s-head"><span class="s-icon">{{ m.icon }}</span></div>
+            <h3 class="s-name">{{ m.name }}</h3>
+            <p class="s-sub">{{ m.description }}</p>
+            <span class="s-status">
+              <span class="dot"></span>
+              {% if status == 'completed' %}COMPLETED
+              {% elif status == 'in_progress' %}IN PROGRESS
+              {% else %}BELUM DIMULAI{% endif %}
+            </span>
+            {% if codes_map.get(m.mission_key) %}
+            <span class="mono text-online" style="font-size:.8rem; margin-top:4px;">{{ codes_map[m.mission_key].code }}</span>
+            {% endif %}
+          </a>
+          {% endif %}
+          {% endfor %}
+        </div>
+
+        <div class="repair-panel glass hud-corners rise-in">
+          <div class="r-head"><span class="r-num">⛓</span><span class="r-title">Final Mission</span></div>
+          <p style="margin-bottom:16px;">Kumpulkan kelima Mission Code. Dislok kelompok memasukkannya di <b class="text-purple">Final Code Station</b> untuk mendapatkan <b class="text-purple">Final Code</b>, lalu gunakan di Website Final Mission.</p>
+          <a href="{{ url_for('go_external', target='final') }}" class="btn btn-purple">BUKA FINAL MISSION ↗</a>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

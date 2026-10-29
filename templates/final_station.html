@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final Mission Station // Restore Data Lab</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mission.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/group.css') }}">
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-ring"></div>
+    <div class="loading-text">CONNECTING TO FINAL MISSION STATION...</div>
+  </div>
+
+  <div class="bg-vignette"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-scanline"></div>
+  <div class="particles" id="particles"></div>
+
+  {% if not unlocked %}
+  <!-- ============ PASSWORD GATE ============ -->
+  <main class="landing-wrap">
+    <div class="container" style="max-width:420px; margin:0 auto;">
+      <div class="glass hud-corners rise-in" style="padding:36px 32px;">
+        <div style="text-align:center; margin-bottom:22px;">
+          <div class="logo-hex" style="margin:0 auto 14px;">🔐</div>
+          <span class="eyebrow">MEJA PANITIA</span>
+          <h1 style="font-size:1.3rem; margin-top:8px;">Final Mission Station</h1>
+          <p style="margin-top:8px; font-size:.85rem;">Masukkan password station untuk mulai memverifikasi Mission Code dan menghasilkan Final Code kelompok.</p>
+        </div>
+
+        <div class="alert alert-error" id="authError">❌ Password salah.</div>
+        <div class="field">
+          <label for="stationPassword">Password Station</label>
+          <input type="password" id="stationPassword" placeholder="••••••••" autocomplete="off">
+        </div>
+        <button type="button" class="btn btn-purple btn-block" id="authSubmit">MASUK STATION →</button>
+        <p style="text-align:center; margin-top:18px;">
+          <a href="{{ url_for('index') }}" class="topbar-link">← Kembali ke Halaman Utama</a>
+        </p>
+      </div>
+    </div>
+  </main>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      initParticles();
+      document.getElementById("authSubmit").addEventListener("click", async () => {
+        hideAlert("authError");
+        const password = document.getElementById("stationPassword").value;
+        const res = await fetch("/api/station/final/auth", {
+          method: "POST", headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({ password }),
+        });
+        const data = await res.json();
+        if (data.success) window.location.reload();
+        else showAlert("authError", "error");
+      });
+      document.getElementById("stationPassword").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") document.getElementById("authSubmit").click();
+      });
+    });
+  </script>
+
+  {% else %}
+  <!-- ============ FINAL MISSION STATION SHELL ============ -->
+  <div class="app-shell">
+    <header class="hud-bar">
+      <a href="{{ url_for('panitia_operations') }}" class="topbar-link">← Panitia Operations</a>
+      <a href="{{ url_for('final_station_lock') }}" class="topbar-link">🔒 Kunci Ulang Station</a>
+      <div class="hud-id">🔐 FINAL MISSION STATION — MEJA PANITIA</div>
+    </header>
+
+    <div class="main-content">
+      <main class="mission-main" style="max-width:720px;">
+        <div class="mission-header rise-in">
+          <span class="eyebrow">FINAL MISSION STATION</span>
+          <h1>Verifikasi Mission Code → Final Code</h1>
+          <p>Masukkan kelima Mission Code (urutan bebas), lalu klik Verify. Final Code bersifat global dan sama untuk semua kelompok.</p>
+        </div>
+
+        <div class="repair-panel glass hud-corners rise-in delay-2">
+          <div class="r-head"><span class="r-num">⛓</span><span class="r-title">Mission Code</span></div>
+          {% for m in missions %}
+          <div class="field">
+            <label for="code{{ loop.index }}">{{ m.icon }} {{ m.name }} — Mission Code {{ loop.index }}</label>
+            <input type="text" id="code{{ loop.index }}" placeholder="XX-0000" autocomplete="off" style="text-transform:uppercase;">
+          </div>
+          {% endfor %}
+          <button type="button" class="btn btn-purple btn-block" id="verifyBtn">⛓ VERIFY MISSION CODES</button>
+        </div>
+
+        <div id="resultBox" class="glass hud-corners locked-note rise-in" style="display:none;"></div>
+
+        <div class="submit-row" style="justify-content:center; display:none;" id="processAnotherRow">
+          <button type="button" class="btn btn-ghost" id="processAnotherBtn">↺ Verifikasi Ulang</button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="overlay" id="scanOverlay">
+    <div class="modal-box glass hud-corners rise-in" style="text-align:left;">
+      <div style="text-align:center;"><div class="loader-ring" style="margin:0 auto;"></div></div>
+      <div class="terminal-box" id="terminalLines"></div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/final_station.js') }}"></script>
+  {% endif %}
+</body>
+</html>

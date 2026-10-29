@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity Log // Dashboard Panitia</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-ring"></div>
+    <div class="loading-text">LOADING ACTIVITY LOG...</div>
+  </div>
+
+  <div class="bg-vignette"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-scanline"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="admin-shell">
+    {% include "_admin_sidebar.html" %}
+
+    <main class="admin-main">
+      <div class="admin-page-head rise-in">
+        <span class="eyebrow">AUDIT TRAIL</span>
+        <h1>Activity Log</h1>
+        <p style="margin-top:8px;">200 aktivitas terbaru. Mencatat login panitia, identifikasi kelompok, submit jawaban, Mission Code, Final Code, dan perubahan pengaturan.</p>
+      </div>
+
+      <form method="GET" action="{{ url_for('admin_logs') }}" class="admin-toolbar">
+        <select name="group">
+          <option value="">Semua Kelompok</option>
+          {% for grp in groups %}<option value="{{ grp.id }}" {{ 'selected' if group_filter == grp.id|string }}>{{ grp.name }}</option>{% endfor %}
+        </select>
+        <button type="submit" class="btn btn-ghost btn-sm">Filter</button>
+      </form>
+
+      <div class="glass hud-corners admin-card rise-in">
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Waktu</th><th>Kelompok</th><th>Mission</th><th>Panitia</th><th>Aksi</th><th>Detail</th></tr></thead>
+            <tbody>
+              {% for log in logs %}
+              <tr>
+                <td class="mono">{{ log.ts }}</td>
+                <td>{{ log.group_name or '—' }}</td>
+                <td>{{ log.mission_name or '—' }}</td>
+                <td>{{ log.admin_username or '—' }}</td>
+                <td><span class="tag-chip">{{ log.action }}</span></td>
+                <td style="white-space:normal; min-width:200px; overflow-wrap:anywhere;">{{ log.detail }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>document.addEventListener("DOMContentLoaded", () => initParticles());</script>
+</body>
+</html>

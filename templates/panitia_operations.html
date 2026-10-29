@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panitia Operations // Restore Data Lab</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/staff.css') }}">
+</head><body>
+<div class="bg-vignette"></div><div class="bg-grid"></div><div class="bg-scanline"></div>
+<main class="page-wrap">
+  <div class="page-head">
+    <div><span class="eyebrow">PANITIA OPERATIONS</span><h1>SELECT MISSION STATION</h1></div>
+    <div class="who">{{ g.admin.username }}
+      {% if g.admin.role == 'admin' %}<a href="{{ url_for('staff_roles') }}" class="topbar-link">Ganti role</a>{% endif %}
+      <a href="{{ url_for('staff_logout') }}" class="topbar-link">Logout</a></div>
+  </div>
+
+  <section class="glass hud-corners ops-section" aria-labelledby="ms">
+    <h2 id="ms">MISSION STATIONS</h2>
+    <p class="sub">Pilih station yang sedang kamu jaga.</p>
+    <div class="station-grid">
+      {% set funcs = {'python':'Answer Verification','database':'Answer Verification'} %}
+      {% set nums = {'python':'01','database':'03'} %}
+      {% for m in stations %}
+      <article class="station-card">
+        <span class="num">MISSION {{ nums[m.mission_key] }}</span>
+        <h3>{{ m.name }}</h3>
+        <p class="fn">{{ funcs[m.mission_key]|safe }}</p>
+        <span class="st"><i class="status-dot"></i>ONLINE</span>
+        <a href="{{ url_for('station_page', key=m.mission_key) }}" class="btn btn-purple btn-sm btn-block">OPEN STATION</a>
+      </article>
+      {% endfor %}
+      {% if kc %}
+      <article class="station-card">
+        <span class="num">MISSION 05</span>
+        <h3>{{ kc.name }}</h3>
+        <p class="fn">Peserta menjawab sendiri; panitia hanya memantau progres</p>
+        <span class="st"><i class="status-dot"></i>WEBSITE 2</span>
+        <a href="{{ url_for('go_external', target='mission5-panitia') }}" class="btn btn-purple btn-sm btn-block">PANTAU KNOWLEDGE CORE ↗</a>
+      </article>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="glass hud-corners ops-section final-section" aria-labelledby="fm">
+    <h2 id="fm">FINAL MISSION OPERATIONS</h2>
+    <p class="sub">Mission Code 1 + 2 + 3 + 4 + 5 → Verify → Final Code.</p>
+    <div class="station-grid">
+      <article class="station-card">
+        <span class="num">FINAL</span>
+        <h3>Final Code Station</h3>
+        <p class="fn">Verifikasi lima Mission Code dan terbitkan Final Code.</p>
+        <a href="{{ url_for('final_station_page') }}" class="btn btn-purple btn-sm btn-block">OPEN FINAL CODE STATION</a>
+      </article>
+    </div>
+  </section>
+</main></body></html>

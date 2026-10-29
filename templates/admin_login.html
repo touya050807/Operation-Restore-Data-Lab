@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Login // Restore Data Lab</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/group.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/staff.css') }}">
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-ring"></div>
+    <div class="loading-text">SECURE STAFF UPLINK...</div>
+  </div>
+
+  <div class="bg-vignette"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-scanline"></div>
+  <div class="particles" id="particles"></div>
+
+  <main class="landing-wrap">
+    <div class="container" style="max-width:420px; margin:0 auto;">
+      <div class="glass hud-corners rise-in" style="padding:36px 32px;">
+        <div style="text-align:center; margin-bottom:22px;">
+          <div class="logo-hex" style="margin:0 auto 14px;">DL</div>
+          <span class="eyebrow">STAFF ACCESS</span>
+          <h1 style="font-size:1.3rem; margin-top:8px;">Staff Login</h1>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-error show">❌ {{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('staff_login') }}">
+          <div class="field">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="username" autocomplete="off" required>
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn btn-purple btn-block">LOGIN</button>
+        </form>
+
+        <p style="text-align:center; margin-top:18px;">
+          <a href="{{ url_for('index') }}" class="topbar-link">Kembali ke halaman awal</a>
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>document.addEventListener("DOMContentLoaded", () => initParticles());</script>
+</body>
+</html>

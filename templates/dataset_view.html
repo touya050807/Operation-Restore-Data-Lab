@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dataset Mahasiswa // Restore Data Lab</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<style>
+  .ds-wrap{ max-width:1200px; margin:0 auto; padding:24px 16px 60px; }
+  .ds-scroll{ overflow:auto; max-height:75vh; border:1px solid var(--border-soft); border-radius:10px; }
+  .ds-table{ border-collapse:collapse; width:100%; font-size:.86rem; min-width:900px; }
+  .ds-table th, .ds-table td{ padding:8px 12px; border-bottom:1px solid var(--border-soft); text-align:left; vertical-align:top;
+    white-space:normal; overflow-wrap:anywhere; }
+  .ds-table th{ position:sticky; top:0; background:#071a36; font-family:var(--font-mono); font-size:.72rem; color:var(--blue); }
+  .ds-table td.empty{ background:rgba(255,176,32,.08); }
+  .ds-table td.empty::after{ content:"(kosong)"; color:var(--text-muted); font-size:.72rem; }
+</style>
+</head>
+<body>
+<div class="ds-wrap">
+  <span class="eyebrow">MISSION 3 // DATABASE VALIDATION</span>
+  <h1 style="margin:6px 0 8px;">Dataset Mahasiswa</h1>
+  <p>{{ rows|length }} baris data · {{ cols|length }} kolom. Sel yang benar-benar kosong ditandai "(kosong)". Geser tabel ke samping jika layar sempit.
+     Isi sel ditampilkan apa adanya (termasuk "-", "N/A", dan teks lain).</p>
+  <p><a class="btn btn-ghost" href="{{ url_for('download_dataset_public') }}">⇩ Unduh CSV</a></p>
+  <div class="ds-scroll" tabindex="0">
+    <table class="ds-table">
+      <thead><tr><th>#</th>{% for c in cols %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr><td>{{ loop.index }}</td>{% for c in cols %}<td class="{{ 'empty' if (r[c] or '').strip() == '' }}">{{ r[c] }}</td>{% endfor %}</tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

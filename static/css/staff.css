@@ -1,0 +1,56 @@
+/* staff.css — komponen revisi: landing, role select, panitia operations, categories.
+   Memakai token main.css (sky blue / cyan / deep navy). */
+.status-dot{ width:12px; height:12px; border-radius:50%; background:var(--online); box-shadow:var(--glow-online); display:inline-block; }
+.status-dot.offline{ background:var(--offline); box-shadow:var(--glow-offline); }
+.status-dot.warn{ background:var(--warn); }
+.cta-stack{ display:flex; flex-direction:column; gap:14px; width:min(360px,100%); margin:8px auto 0; }
+.cta-stack .btn{ padding:16px 22px; font-size:.82rem; letter-spacing:.14em; }
+.cta-primary{ background:linear-gradient(135deg,rgba(56,189,248,.28),rgba(34,211,238,.18)); border-color:var(--purple); }
+.hero-sub{ font-family:var(--font-mono); letter-spacing:.2em; font-size:.78rem; color:var(--text-muted); margin:-6px 0 18px; }
+.sys-strip{ display:flex; flex-wrap:wrap; gap:18px; justify-content:center; margin-top:22px; font-family:var(--font-mono); font-size:.72rem; color:var(--text-muted); }
+.sys-strip span{ display:inline-flex; align-items:center; gap:8px; }
+
+.page-wrap{ width:min(1080px,100% - 32px); margin:0 auto; padding:28px 0 56px; }
+.page-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:26px; }
+.page-head h1{ font-size:clamp(1.2rem,3vw,1.7rem); margin:4px 0 0; }
+.page-head .who{ font-family:var(--font-mono); font-size:.74rem; color:var(--text-muted); }
+.page-head .who a{ margin-left:12px; }
+
+.role-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; max-width:760px; margin:0 auto; }
+.role-card, .station-card{ padding:26px 22px; display:flex; flex-direction:column; gap:10px; transition:transform .18s, box-shadow .18s, border-color .18s; }
+.role-card:hover, .station-card:hover{ transform:translateY(-3px); border-color:var(--purple); box-shadow:var(--glow-purple); }
+.role-card h2{ font-size:1.15rem; letter-spacing:.18em; margin:0; }
+.role-card p{ margin:0 0 10px; color:var(--text-muted); font-size:.88rem; }
+.role-card.disabled{ opacity:.45; pointer-events:none; }
+
+.ops-section{ padding:22px; margin-bottom:22px; }
+.ops-section > h2{ font-size:.95rem; letter-spacing:.2em; margin:0 0 4px; }
+.ops-section > .sub{ margin:0 0 18px; color:var(--text-muted); font-size:.85rem; }
+.station-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+.station-card{ background:rgba(11,29,58,.55); border:1px solid var(--border-soft); border-radius:var(--radius); }
+.station-card .num{ font-family:var(--font-mono); font-size:.72rem; letter-spacing:.2em; color:var(--blue); }
+.station-card h3{ margin:0; font-size:1rem; }
+.station-card .fn{ margin:0 0 6px; color:var(--text-muted); font-size:.84rem; flex:1; }
+.station-card .st{ font-family:var(--font-mono); font-size:.72rem; display:flex; align-items:center; gap:8px; color:var(--online); }
+.final-section{ border-color:rgba(255,176,32,.35); }
+
+.alert-bar{ padding:12px 16px; border-radius:10px; margin-bottom:16px; font-size:.88rem; border:1px solid var(--border-soft); }
+.alert-bar.err{ border-color:var(--offline); color:#ffb3c0; background:rgba(255,77,109,.08); }
+.alert-bar.ok{ border-color:var(--online); color:#9cf5c8; background:rgba(34,229,132,.08); }
+
+.cat-table{ width:100%; border-collapse:collapse; }
+.cat-table th,.cat-table td{ padding:11px 10px; text-align:left; border-bottom:1px solid var(--border-soft); font-size:.88rem; vertical-align:top; }
+.cat-table th{ font-family:var(--font-mono); font-size:.7rem; letter-spacing:.1em; color:var(--blue); text-transform:uppercase; }
+.table-scroll{ overflow-x:auto; }
+.badge{ font-family:var(--font-mono); font-size:.68rem; padding:3px 9px; border-radius:999px; border:1px solid var(--border); }
+.badge.on{ color:var(--online); border-color:rgba(34,229,132,.5); } .badge.off{ color:var(--text-dim); }
+.modal-back{ position:fixed; inset:0; background:rgba(3,11,26,.78); display:none; align-items:center; justify-content:center; z-index:90; padding:16px; }
+.modal-back.show{ display:flex; }
+.modal-back .modal-box{ width:min(460px,100%); padding:26px 24px; }
+.modal-back input[type=text], .modal-back textarea, .modal-back select{ width:100%; padding:10px 14px; background:rgba(3,11,26,.7); border:1px solid var(--border-soft); border-radius:8px; color:var(--text); font-family:inherit; }
+.radio-row{ display:flex; gap:20px; font-size:.9rem; }
+.modal-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:18px; flex-wrap:wrap; }
+
+.q-hidden{ display:none !important; }
+@media (max-width:640px){ .ops-section{ padding:16px; } .cta-stack .btn{ padding:14px 16px; } }
+@media (prefers-reduced-motion:reduce){ .role-card,.station-card{ transition:none; } }

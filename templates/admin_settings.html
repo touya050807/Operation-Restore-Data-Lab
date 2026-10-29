@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pengaturan Challenge // Dashboard Panitia</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-ring"></div>
+    <div class="loading-text">LOADING CHALLENGE SETTINGS...</div>
+  </div>
+
+  <div class="bg-vignette"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-scanline"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="admin-shell">
+    {% include "_admin_sidebar.html" %}
+
+    <main class="admin-main">
+      <div class="admin-page-head rise-in">
+        <span class="eyebrow">CHALLENGE SETTINGS</span>
+        <h1>Pengaturan Challenge</h1>
+      </div>
+
+      {% if msg %}<div class="alert alert-success show" role="status">{{ msg }}</div>{% endif %}
+      <div class="glass hud-corners admin-card rise-in" id="cooldownCard">
+        <h3>Jeda Jawaban Salah ({{ cooldown_seconds }} detik)</h3>
+        <p>Berlaku <b>hanya</b> untuk Mission 2 — Problem Analysis Center dan Mission 4 — Algorithm Engine. Jika aktif, kelompok yang menjawab salah harus menunggu {{ cooldown_seconds }} detik sebelum menjawab lagi di misi itu.
+           Jawaban benar tidak memicu jeda. Python Runtime, Database Validation, Knowledge Core, dan Final Mission tidak terpengaruh. Jika dinonaktifkan, peserta langsung bisa mencoba lagi.</p>
+        <p>Status saat ini: <b id="cooldownState" class="{{ 'text-online' if cooldown_enabled else 'text-offline' }}">{{ 'AKTIF' if cooldown_enabled else 'NONAKTIF' }}</b></p>
+        <form method="POST" action="{{ url_for('admin_wrong_cooldown_update') }}">
+          <input type="hidden" name="enabled" value="{{ '0' if cooldown_enabled else '1' }}">
+          <button type="submit" class="btn btn-purple btn-sm" id="cooldownToggle">{{ 'NONAKTIFKAN JEDA' if cooldown_enabled else 'AKTIFKAN JEDA' }}</button>
+        </form>
+      </div>
+
+      <!-- ============ KATEGORI (dipindah ke Category Management) ============ -->
+      <div class="glass hud-corners admin-card rise-in">
+        <h3>Kategori Bank Soal</h3>
+        <p>Kategori kini dikelola di halaman khusus (tambah, ubah, hapus, status aktif).</p>
+        <a href="{{ url_for('admin_categories') }}" class="btn btn-purple btn-sm">BUKA KNOWLEDGE CORE → CATEGORIES</a>
+      </div>
+
+    </main>
+  </div>
+
+  <template id="fieldRowTemplate">
+    <div class="admin-form-grid field-row" style="align-items:end; margin-bottom:10px; padding-bottom:10px; border-bottom:1px dashed var(--border-soft);">
+      <div class="field" style="margin-bottom:6px;"><label>Label</label><input type="text" name="field_label" value=""></div>
+      <div class="field" style="margin-bottom:6px;"><label>Icon</label><input type="text" name="field_icon" value="📄"></div>
+      <div class="field" style="margin-bottom:6px;">
+        <label>Tipe</label>
+        <select name="field_type"><option value="textarea">Textarea</option><option value="code">Code</option></select>
+      </div>
+      <input type="hidden" name="field_id" value="">
+      <div style="display:flex; align-items:center;"><button type="button" class="btn btn-ghost btn-sm remove-field-row">✕ Hapus</button></div>
+    </div>
+  </template>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/admin_settings.js') }}"></script>
+</body>
+</html>

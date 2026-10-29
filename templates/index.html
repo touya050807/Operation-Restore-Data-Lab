@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operation: Restore Data Lab</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/staff.css') }}">
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-ring"></div>
+    <div class="loading-text">ESTABLISHING SECURE UPLINK...</div>
+  </div>
+
+  <div class="bg-vignette"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-scanline"></div>
+  <div class="particles" id="particles"></div>
+
+  <main class="landing-wrap">
+    <div class="container hero-inner">
+
+      <div class="logo-badge rise-in">
+        <div class="logo-hex">DL</div>
+        <span class="eyebrow">DATA LAB ITSB // EMERGENCY RECOVERY TERMINAL</span>
+      </div>
+
+      <h1 class="hero-title rise-in delay-1">OPERATION: RESTORE DATA LAB</h1>
+
+      <div class="story-box glass hud-corners rise-in delay-2">
+        <p class="mono story-line" id="storyText"></p>
+      </div>
+
+      <p class="hero-sub rise-in delay-2">EMERGENCY DATA RECOVERY SYSTEM · AXIS 2026</p>
+
+      <div class="cta-stack rise-in delay-3">
+        <a href="{{ url_for('group_select') }}" class="btn btn-purple cta-primary">ENTER AS PARTICIPANT</a>
+        <a href="{{ url_for('staff_login') }}" class="btn btn-ghost">STAFF LOGIN</a>
+      </div>
+
+      <div class="sys-strip rise-in delay-4">
+        <span><i class="status-dot offline"></i>Data servers offline</span>
+        <span><i class="status-dot warn"></i>Recovery team standby</span>
+      </div>
+    </div>
+  </main>
+
+  
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+</body>
+</html>

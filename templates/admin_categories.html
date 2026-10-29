@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Categories // Admin Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/staff.css') }}">
+</head><body>
+<div class="bg-vignette"></div><div class="bg-grid"></div>
+<div class="admin-shell">
+  {% set active = 'categories' %}{% include '_admin_sidebar.html' %}
+  <main class="admin-main">
+    <div class="admin-page-head">
+      <span class="eyebrow">ADMIN · KNOWLEDGE CORE</span>
+      <h1>Categories</h1>
+    </div>
+    {% if msg %}<div class="alert-bar ok">{{ msg }}</div>{% endif %}
+    {% if err %}<div class="alert-bar err">{{ err }}</div>{% endif %}
+
+    <div class="glass hud-corners admin-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+        <h3 style="margin:0;">{{ categories|length }} kategori</h3>
+        <button type="button" class="btn btn-purple btn-sm" id="addBtn">+ ADD CATEGORY</button>
+      </div>
+      <div class="table-scroll"><table class="cat-table">
+        <thead><tr><th>Nama</th><th>Deskripsi</th><th>Soal</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+        {% for c in categories %}
+        <tr>
+          <td><b>{{ c.name }}</b></td>
+          <td class="text-muted">{{ c.description or '—' }}</td>
+          <td>{{ c.question_count }}</td>
+          <td><span class="badge {{ 'on' if c.is_active else 'off' }}">{{ 'ACTIVE' if c.is_active else 'INACTIVE' }}</span></td>
+          <td style="white-space:nowrap;">
+            <button type="button" class="btn btn-ghost btn-sm js-edit" data-id="{{ c.id }}" data-name="{{ c.name }}" data-desc="{{ c.description }}" data-active="{{ c.is_active }}">Edit</button>
+            <button type="button" class="btn btn-ghost btn-sm js-del" data-id="{{ c.id }}" data-name="{{ c.name }}" data-count="{{ c.question_count }}">Delete</button>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted">Belum ada kategori. Tambahkan yang pertama.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table></div>
+    </div>
+  </main>
+</div>
+
+<!-- Add / Edit -->
+<div class="modal-back" id="catModal"><form method="POST" action="{{ url_for('admin_category_save') }}" class="glass hud-corners modal-box">
+  <h3 id="catTitle" style="margin-top:0;">Add Category</h3>
+  <input type="hidden" name="id" id="c_id">
+  <div class="field"><label for="c_name">Category Name</label><input type="text" name="name" id="c_name" required maxlength="80"></div>
+  <div class="field"><label for="c_desc">Description</label><textarea name="description" id="c_desc" rows="2"></textarea></div>
+  <div class="field"><label>Status</label>
+    <div class="radio-row"><label><input type="radio" name="status" value="active" checked> Active</label>
+    <label><input type="radio" name="status" value="inactive"> Inactive</label></div></div>
+  <div class="modal-actions"><button type="button" class="btn btn-ghost btn-sm js-close">Batal</button>
+  <button type="submit" class="btn btn-purple btn-sm">SAVE CATEGORY</button></div>
+</form></div>
+
+<!-- Delete -->
+<div class="modal-back" id="delModal"><form method="POST" id="delForm" class="glass hud-corners modal-box">
+  <h3 style="margin-top:0;">Delete Category</h3>
+  <p id="delText"></p>
+  <div class="field" id="moveWrap" style="display:none;"><label for="move_to">Pindahkan soal ke</label>
+    <select name="move_to" id="move_to">
+      {% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+    </select></div>
+  <div class="modal-actions"><button type="button" class="btn btn-ghost btn-sm js-close">Batal</button>
+  <button type="submit" class="btn btn-purple btn-sm">CONFIRM DELETE</button></div>
+</form></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const open = (id) => $(id).classList.add("show");
+document.querySelectorAll(".js-close").forEach(b => b.addEventListener("click", () => b.closest(".modal-back").classList.remove("show")));
+$("addBtn").addEventListener("click", () => {
+  $("catTitle").textContent = "Add Category"; $("c_id").value = ""; $("c_name").value = ""; $("c_desc").value = "";
+  document.querySelector('input[name=status][value=active]').checked = true; open("catModal"); $("c_name").focus();
+});
+document.querySelectorAll(".js-edit").forEach(b => b.addEventListener("click", () => {
+  const d = b.dataset; $("catTitle").textContent = "Edit Category"; $("c_id").value = d.id; $("c_name").value = d.name; $("c_desc").value = d.desc;
+  document.querySelector(`input[name=status][value=${d.active === "1" ? "active" : "inactive"}]`).checked = true; open("catModal");
+}));
+document.querySelectorAll(".js-del").forEach(b => b.addEventListener("click", () => {
+  const d = b.dataset, n = parseInt(d.count, 10);
+  $("delForm").action = `/admin/categories/${d.id}/delete`;
+  $("delText").textContent = n > 0 ? `This category is currently used by ${n} questions. Pilih kategori tujuan; soal tersebut akan dipindahkan, tidak dihapus.` : `Hapus kategori "${d.name}"? Tindakan ini tidak bisa dibatalkan.`;
+  $("moveWrap").style.display = n > 0 ? "block" : "none";
+  $("move_to").disabled = n === 0;
+  [...$("move_to").options].forEach(o => { o.hidden = o.value === d.id; o.disabled = o.value === d.id; });
+  const first = [...$("move_to").options].find(o => !o.disabled); if (first) $("move_to").value = first.value;
+  open("delModal");
+}));
+document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelectorAll(".modal-back.show").forEach(m => m.classList.remove("show")); });
+</script>
+</body></html>

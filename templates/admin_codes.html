@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codes &amp; Links // Admin Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/staff.css') }}">
+</head><body>
+<div class="bg-vignette"></div><div class="bg-grid"></div>
+<div class="admin-shell">
+  {% set active = 'codes' %}{% include '_admin_sidebar.html' %}
+  <main class="admin-main">
+    <div class="admin-page-head"><span class="eyebrow">ADMIN</span><h1>Mission Code, Final Code &amp; Links</h1></div>
+    {% if msg %}<div class="alert-bar ok">{{ msg }}</div>{% endif %}
+
+    <form method="POST" action="{{ url_for('admin_codes_save') }}">
+      <div class="glass hud-corners admin-card">
+        <h3>Mission Code (global — sama untuk semua kelompok)</h3>
+        {% for c in codes %}
+        <div class="field"><label for="code_{{ c.mission.mission_key }}">{{ c.mission.icon }} {{ c.mission.name }}</label>
+          <input type="text" id="code_{{ c.mission.mission_key }}" name="code_{{ c.mission.mission_key }}" value="{{ c.code }}" {{ 'readonly' if c.locked }} autocomplete="off">
+          {% if c.locked %}<small class="text-muted">Dikunci oleh environment variable (MISSION1_CODE … MISSION5_CODE). Ubah di pengaturan hosting.</small>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      <div class="glass hud-corners admin-card">
+        <h3>Final Code (global)</h3>
+        <div class="field"><label for="final_code">Final Code</label>
+          <input type="text" id="final_code" name="final_code" value="{{ final.code }}" {{ 'readonly' if final.locked }} autocomplete="off">
+          {% if final.locked %}<small class="text-muted">Dikunci oleh environment variable FINAL_CODE.</small>{% endif %}
+        </div>
+      </div>
+      <div class="glass hud-corners admin-card">
+        <h3>Link Website</h3>
+        <div class="field"><label for="url_w2">Website 2 — Mission 5 (Knowledge Core)</label>
+          <input type="text" id="url_w2" name="url_w2" value="{{ links.w2.value }}" placeholder="https://..." {{ 'readonly' if links.w2.locked }}></div>
+        <div class="field"><label for="url_w3">Website 3 — Final Mission</label>
+          <input type="text" id="url_w3" name="url_w3" value="{{ links.w3.value }}" placeholder="https://..." {{ 'readonly' if links.w3.locked }}></div>
+      </div>
+      <button type="submit" class="btn btn-purple">SIMPAN</button>
+      <a href="{{ url_for('admin_codes', check=1) }}" class="btn btn-ghost">CEK KONSISTENSI KODE</a>
+      <a href="{{ url_for('admin_backup') }}" class="btn btn-ghost">⇩ BACKUP DATABASE</a>
+    </form>
+
+    {% if check %}
+    <div class="glass hud-corners admin-card" style="margin-top:18px;">
+      <h3>Hasil pengecekan</h3>
+      <p>Mission Code 5 (Website 2): {% if check.w2.match %}<span class="badge on">COCOK</span>{% else %}<span class="badge off">TIDAK COCOK / TIDAK TERJANGKAU</span> <small>{{ check.w2.error or 'Nilai berbeda dari Website 1.' }}</small>{% endif %}</p>
+      <p>Final Code (Website 3): {% if check.w3.match %}<span class="badge on">COCOK</span>{% else %}<span class="badge off">TIDAK COCOK / TIDAK TERJANGKAU</span> <small>{{ check.w3.error or 'Nilai berbeda dari Website 1.' }}</small>{% endif %}</p>
+      <small class="text-muted">Yang dibandingkan hanya sidik jari hash — kode asli tidak dikirim lewat jaringan.</small>
+    </div>
+    {% endif %}
+  </main>
+</div></body></html>

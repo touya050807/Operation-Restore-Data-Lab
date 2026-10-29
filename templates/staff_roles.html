@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Select Staff Role // Restore Data Lab</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/staff.css') }}">
+</head><body>
+<div class="bg-vignette"></div><div class="bg-grid"></div><div class="bg-scanline"></div>
+<main class="page-wrap">
+  <div class="page-head">
+    <div><span class="eyebrow">STAFF ACCESS</span><h1>SELECT STAFF ROLE</h1></div>
+    <div class="who">{{ g.admin.username }}<a href="{{ url_for('staff_logout') }}" class="topbar-link">Logout</a></div>
+  </div>
+  <div class="role-grid">
+    <form method="POST" action="{{ url_for('staff_role_select') }}" class="glass hud-corners role-card">
+      <input type="hidden" name="role" value="panitia">
+      <h2>PANITIA</h2>
+      <p>Access Mission Stations</p>
+      <button type="submit" class="btn btn-purple btn-block">CONTINUE</button>
+    </form>
+    <form method="POST" action="{{ url_for('staff_role_select') }}" class="glass hud-corners role-card {{ '' if 'admin' in allowed else 'disabled' }}">
+      <input type="hidden" name="role" value="admin">
+      <h2>ADMIN</h2>
+      <p>{{ 'Manage Challenge System' if 'admin' in allowed else 'Akun ini tidak memiliki akses Admin' }}</p>
+      <button type="submit" class="btn btn-purple btn-block" {{ '' if 'admin' in allowed else 'disabled' }}>CONTINUE</button>
+    </form>
+  </div>
+</main></body></html>

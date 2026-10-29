@@ -1,0 +1,27 @@
+{# ============================================================================
+   _admin_sidebar.html — navigasi Dashboard Panitia
+   Butuh variabel: active
+   ============================================================================ #}
+<aside class="admin-sidebar glass">
+  <div class="admin-sidebar-logo">
+    <div class="logo-mark">DL</div>
+    <div class="logo-text">RESTORE<br>DATA LAB<small>ADMIN DASHBOARD</small></div>
+  </div>
+
+  <nav class="admin-nav">
+    <a href="{{ url_for('admin_dashboard') }}" class="{{ 'active' if active == 'dashboard' }}">📊 Dashboard</a>
+    <a href="{{ url_for('admin_groups') }}" class="{{ 'active' if active == 'groups' }}">👥 Kelompok</a>
+    <a href="{{ url_for('admin_missions') }}" class="{{ 'active' if active == 'missions' }}">🛰 Mission</a>
+    <a href="{{ url_for('admin_questions') }}" class="{{ 'active' if active == 'questions' }}">📚 Bank Soal</a>
+    <a href="{{ url_for('admin_categories') }}" class="{{ 'active' if active == 'categories' }}">🏷 Kategori Soal</a>
+    <a href="{{ url_for('admin_codes') }}" class="{{ 'active' if active == 'codes' }}">🔑 Codes &amp; Links</a>
+    <a href="{{ url_for('admin_settings') }}" class="{{ 'active' if active == 'settings' }}">⚙ Pengaturan Challenge</a>
+    <a href="{{ url_for('admin_reset_page') }}" class="{{ 'active' if active == 'reset' }}">⟲ Reset Pengerjaan</a>
+    <a href="{{ url_for('admin_logs') }}" class="{{ 'active' if active == 'logs' }}">📝 Activity Log</a>
+  </nav>
+
+  <div class="admin-sidebar-footer">
+    Login sebagai <b class="text-blue">{{ g.admin.username }}</b><br>
+    <a href="{{ url_for('staff_roles') }}">Ganti role</a> · <a href="{{ url_for('staff_logout') }}">Logout</a>
+  </div>
+</aside>
